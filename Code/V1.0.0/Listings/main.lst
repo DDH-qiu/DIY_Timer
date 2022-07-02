@@ -1,0 +1,103 @@
+C51 COMPILER V9.59.0.0   MAIN                                                              07/02/2022 12:41:05 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Program Files\MDK\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Inc) DEBUG OBJECTEXTE
+                    -ND PRINT(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include"reg51.h"
+   2          unsigned char Time_num=0;
+   3          unsigned char Key_num;
+   4          
+   5          //定时器0初始化,50ms的计数时间
+   6          void Timer_Init()
+   7          {
+   8   1        TMOD &= 0x0F;   //设置定时器模式
+   9   1        TL0 = 0xB0;   //设置定时初始值
+  10   1        TH0 = 0x3C;   //设置定时初始值
+  11   1        TF0 = 0;    //清除TF1标志
+  12   1        TR0 = 1;    //定时器1开始计时
+  13   1        ET0=1;      //开启定时器中断
+  14   1        EA=1;     //开启总中断
+  15   1      }
+  16          
+  17          //时间计数
+  18          void Time_Count()
+  19          {
+  20   1        // P1=0XFE;//初始化，1111 1110
+  21   1        if (Time_num==180)
+  22   1        {
+  23   2          P1=0xFC;//15分钟到，1111 1100
+  24   2        }
+  25   1        if (Time_num==360)
+  26   1        {
+  27   2          P1=0xF8;//30分钟到，1111 1000
+  28   2        }
+  29   1        if (Time_num==361)
+  30   1        {
+  31   2          P1=0xF0;//45分钟到，1111 0000
+  32   2        }
+  33   1        if (Time_num==720)
+  34   1        {
+  35   2          P1=0xFF;//60分钟到，1111 1111
+  36   2          Time_num=0;//复位
+  37   2        }
+  38   1      }
+  39          
+  40          //主函数
+  41          int main()
+  42          {
+  43   1        
+  44   1        while(1)
+  45   1        {
+  46   2          Timer_Init();
+  47   2          Time_Count();
+  48   2        }
+  49   1      }
+  50          
+  51          
+  52          void Timer0_isr() interrupt 1
+  53          {
+  54   1        
+C51 COMPILER V9.59.0.0   MAIN                                                              07/02/2022 12:41:05 PAGE 2   
+
+  55   1        TL0=0xB0;   //设置定时初始值
+  56   1        TH0=0x3C;   //设置定时初始值
+  57   1        // TF0= 0;    //清除TF1标志
+  58   1        Time_num++;//将该数字加一
+  59   1        // if (Time_num>=180)
+  60   1        // {
+  61   1        //  P1=0xFC;//15分钟到，1111 1100
+  62   1        // }
+  63   1        // if (Time_num>=360)
+  64   1        // {
+  65   1        //  P1=0xF8;//30分钟到，1111 1000
+  66   1        // }
+  67   1        // if (Time_num>=400)
+  68   1        // {
+  69   1        //  P1=0xF0;//45分钟到，1111 0000
+  70   1        // }
+  71   1        // if (Time_num==450)
+  72   1        // {
+  73   1        //  P1=0xFF;//60分钟到，1111 1111
+  74   1        //  Time_num=0;//复位
+  75   1        // }
+  76   1        // TR0=1;
+  77   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     78    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

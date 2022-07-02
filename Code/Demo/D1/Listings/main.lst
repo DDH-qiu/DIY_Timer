@@ -1,0 +1,136 @@
+C51 COMPILER V9.59.0.0   MAIN                                                              07/01/2022 22:22:29 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Program Files\MDK\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Inc) DEBUG OBJECTEXTE
+                    -ND PRINT(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <DS1302.h>
+   2          /* ***************************************************** */
+   3          // 位定义
+   4          /* ***************************************************** */
+   5          //74HC595
+   6          sbit smgSER = P3^4;   // 595（14脚）SER  数据输入引脚
+   7          sbit RCK = P3^3;    // 595（12脚）STCP 锁存时钟 1个上升沿所存一次数据
+   8          sbit SCK = P3^2;    // 595（11脚）SHCP 移位时钟 8个时钟移入一个字节
+   9          
+  10          /* ***************************************************** */
+  11          // 数组定义
+  12          /* ***************************************************** */
+  13          //位选数组
+  14          unsigned char  Bit_Tab[] = 
+  15          {0xfe,0xfd,0xfb,0xf7,0xef,0xdf,0xbf,0x7f};    
+  16          //段选数组
+  17          unsigned char  Disp_Tab[] = 
+  18          {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x77,0x7c,0x39,0x5e,0x79,0x71};
+  19          
+  20          /* ***************************************************** 
+  21           函数名称：DelayMS()
+  22           函数功能：毫秒延时
+  23           入口参数：延时毫秒数（ValMS）
+  24           出口参数：无
+  25           ***************************************************** */
+  26          //void DelayMS(u16 ValMS)
+  27          //{
+  28          //  u16 uiVal,ujVal;
+  29          //  for(uiVal = 0; uiVal < ValMS; uiVal++)
+  30          //    for(ujVal = 0; ujVal < 120; ujVal++);
+  31          //}
+  32          /* ******************************************************************
+  33           * 函数名称：HC595_WrOneByte()
+  34           * 函数功能：向HC595中写入一个字节
+  35           * 入口参数：待写入HC595的一个字节（ucDat）
+  36           * 出口参数：无
+  37          /****************************************************************** */
+  38          void HC595_WrOneByte(unsigned char ucDat)
+  39          {
+  40   1        unsigned char i = 0;
+  41   1        //通过8循环将8位数据一次移入74HC595
+  42   1        for(i=0;i<8;i++)
+  43   1        {
+  44   2          smgSER = (bit)(ucDat & 0x80);
+  45   2          SCK = 0;
+  46   2          ucDat <<= 1;
+  47   2          SCK = 1;
+  48   2        }
+  49   1        //数据并行输出（借助上升沿）
+  50   1        RCK = 0;    
+  51   1        _nop_();
+  52   1        _nop_();
+  53   1        RCK = 1;
+  54   1      }
+C51 COMPILER V9.59.0.0   MAIN                                                              07/01/2022 22:22:29 PAGE 2   
+
+  55          /* ******************************************************************
+  56           * 函数名称：Datapro
+  57           * 函数功能：数据处理
+  58           * 入口参数：无
+  59           * 出口参数：无
+  60          /****************************************************************** */
+  61          void Datapro(void)
+  62          {
+  63   1        DS1302_ReadTime();
+  64   1        P2= Bit_Tab[0];                    // 送位选数据
+  65   1        HC595_WrOneByte(Disp_Tab[TIME[2]/16]);     // 送段选数据
+  66   1        HC595_WrOneByte(0x00);               // 消除鬼影现象
+  67   1        
+  68   1        P2 = Bit_Tab[1];
+  69   1        HC595_WrOneByte(Disp_Tab[TIME[2]&0x0f]);
+  70   1        HC595_WrOneByte(0x00);
+  71   1        
+  72   1        P2= Bit_Tab[2];
+  73   1        HC595_WrOneByte(0x40);
+  74   1        HC595_WrOneByte(0x00);
+  75   1        
+  76   1        P2 = Bit_Tab[3];
+  77   1        HC595_WrOneByte(Disp_Tab[TIME[1]/16]);
+  78   1        HC595_WrOneByte(0x00);
+  79   1        
+  80   1        P2 = Bit_Tab[4];
+  81   1        HC595_WrOneByte(Disp_Tab[TIME[1]&0x0f]);
+  82   1        HC595_WrOneByte(0x00);
+  83   1        
+  84   1        P2 = Bit_Tab[5];
+  85   1        HC595_WrOneByte(0x40);
+  86   1        HC595_WrOneByte(0x00);
+  87   1        
+  88   1        P2 = Bit_Tab[6];
+  89   1        HC595_WrOneByte(Disp_Tab[TIME[0]/16]);
+  90   1        HC595_WrOneByte(0x00);
+  91   1        
+  92   1        P2 = Bit_Tab[7];
+  93   1        HC595_WrOneByte(Disp_Tab[TIME[0]&0x0f]);
+  94   1        HC595_WrOneByte(0x00);
+  95   1        
+  96   1      }
+  97          
+  98          
+  99          
+ 100          
+ 101          void main(void)
+ 102          {
+ 103   1        DS1302_Init();
+ 104   1        while(1)
+ 105   1        {
+ 106   2          Datapro();
+ 107   2        }
+ 108   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    134    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     24    ----
+C51 COMPILER V9.59.0.0   MAIN                                                              07/01/2022 22:22:29 PAGE 3   
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
