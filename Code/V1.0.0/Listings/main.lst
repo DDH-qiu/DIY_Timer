@@ -1,4 +1,4 @@
-C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:45:48 PAGE 1   
+C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:55:12 PAGE 1   
 
 
 C51 COMPILER V9.59.0.0, COMPILATION OF MODULE MAIN
@@ -62,7 +62,7 @@ line level    source
   52   1        k = 187;
   53   1        do
   54   1        {
-C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:45:48 PAGE 2   
+C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:55:12 PAGE 2   
 
   55   2          do
   56   2          {
@@ -89,7 +89,7 @@ line level    source
   77          void Time_Count()
   78          {
   79   1        char i=0;
-  80   1        if (Seconds_num==9)
+  80   1        if (Seconds_num==900)
   81   1        {
   82   2          LED_w2=0;//15分钟到，1111 1100
   83   2          Buzzer=0;
@@ -97,7 +97,7 @@ line level    source
   85   2          Buzzer=1;
   86   2        }
   87   1      
-  88   1        if (Seconds_num==18)
+  88   1        if (Seconds_num==1800)
   89   1        {
   90   2          LED_w3=0;//30分钟到，1111 1000
   91   2          Buzzer=0;
@@ -105,7 +105,7 @@ line level    source
   93   2          Buzzer=1;
   94   2        }
   95   1      
-  96   1        if (Seconds_num==27)
+  96   1        if (Seconds_num==2700)
   97   1        {
   98   2          LED_r=0;//45分钟到，1111 0000
   99   2          Buzzer=0;
@@ -113,7 +113,7 @@ line level    source
  101   2          Buzzer=1;
  102   2        }
  103   1      
- 104   1        if (Seconds_num==36)
+ 104   1        if (Seconds_num==3600)
  105   1        {
  106   2          // P1&=0x0F;//60分钟到，1110 1111 
  107   2          for (i=0;i<3;i++)
@@ -126,7 +126,7 @@ line level    source
  114   2          TR0=0;
  115   2        }
  116   1      }
-C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:45:48 PAGE 3   
+C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:55:12 PAGE 3   
 
  117          
  118          //按键检测
@@ -187,10 +187,10 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    215    ----
+   CODE SIZE        =    231    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
-C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:45:48 PAGE 4   
+C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:55:12 PAGE 4   
 
    PDATA SIZE       =   ----    ----
    DATA SIZE        =      5    ----
