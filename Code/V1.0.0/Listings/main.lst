@@ -1,4 +1,4 @@
-C51 COMPILER V9.59.0.0   MAIN                                                              07/02/2022 12:41:05 PAGE 1   
+C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:45:48 PAGE 1   
 
 
 C51 COMPILER V9.59.0.0, COMPILATION OF MODULE MAIN
@@ -8,93 +8,192 @@ COMPILER INVOKED BY: C:\Program Files\MDK\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEE
 
 line level    source
 
-   1          #include"reg51.h"
-   2          unsigned char Time_num=0;
-   3          unsigned char Key_num;
-   4          
-   5          //定时器0初始化,50ms的计数时间
-   6          void Timer_Init()
-   7          {
-   8   1        TMOD &= 0x0F;   //设置定时器模式
-   9   1        TL0 = 0xB0;   //设置定时初始值
-  10   1        TH0 = 0x3C;   //设置定时初始值
-  11   1        TF0 = 0;    //清除TF1标志
-  12   1        TR0 = 1;    //定时器1开始计时
-  13   1        ET0=1;      //开启定时器中断
-  14   1        EA=1;     //开启总中断
-  15   1      }
+   1          #include"reg52.h"
+   2          #include"intrins.h"
+   3          
+   4          unsigned char Time_num=0;
+   5          unsigned char Seconds_num=0;
+   6          unsigned char Key_num=0,key_value=0,fun_num=0;
+   7          sbit LED_w1=P1^0;
+   8          sbit LED_w2=P1^1;
+   9          sbit LED_w3=P1^2;
+  10          sbit LED_r=P1^3;
+  11          sbit Buzzer=P1^4;
+  12          sbit key_num=P1^5;
+  13          sbit star_num=P1^6;
+  14          sbit LED_star=P1^7;
+  15          
   16          
-  17          //时间计数
-  18          void Time_Count()
+  17          //软件延时3ms
+  18          void Delay3ms()   //@12.000MHz
   19          {
-  20   1        // P1=0XFE;//初始化，1111 1110
-  21   1        if (Time_num==180)
-  22   1        {
-  23   2          P1=0xFC;//15分钟到，1111 1100
-  24   2        }
-  25   1        if (Time_num==360)
-  26   1        {
-  27   2          P1=0xF8;//30分钟到，1111 1000
-  28   2        }
-  29   1        if (Time_num==361)
-  30   1        {
-  31   2          P1=0xF0;//45分钟到，1111 0000
-  32   2        }
-  33   1        if (Time_num==720)
-  34   1        {
-  35   2          P1=0xFF;//60分钟到，1111 1111
-  36   2          Time_num=0;//复位
-  37   2        }
-  38   1      }
-  39          
-  40          //主函数
-  41          int main()
-  42          {
-  43   1        
-  44   1        while(1)
-  45   1        {
-  46   2          Timer_Init();
-  47   2          Time_Count();
-  48   2        }
-  49   1      }
-  50          
-  51          
-  52          void Timer0_isr() interrupt 1
-  53          {
-  54   1        
-C51 COMPILER V9.59.0.0   MAIN                                                              07/02/2022 12:41:05 PAGE 2   
+  20   1        unsigned char i, j;
+  21   1      
+  22   1        i = 6;
+  23   1        j = 211;
+  24   1        do
+  25   1        {
+  26   2          while (--j);
+  27   2        } while (--i);
+  28   1      }
+  29          
+  30          void Delay100ms()   //@12.000MHz
+  31          {
+  32   1        unsigned char i, j;
+  33   1      
+  34   1        i = 195;
+  35   1        j = 138;
+  36   1        do
+  37   1        {
+  38   2          while (--j);
+  39   2        } while (--i);
+  40   1      }
+  41          
+  42          
+  43          
+  44          //软件延时500ms
+  45          void Delay500ms()   //@12.000MHz
+  46          {
+  47   1        unsigned char i, j, k;
+  48   1      
+  49   1        _nop_();
+  50   1        i = 4;
+  51   1        j = 205;
+  52   1        k = 187;
+  53   1        do
+  54   1        {
+C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:45:48 PAGE 2   
 
-  55   1        TL0=0xB0;   //设置定时初始值
-  56   1        TH0=0x3C;   //设置定时初始值
-  57   1        // TF0= 0;    //清除TF1标志
-  58   1        Time_num++;//将该数字加一
-  59   1        // if (Time_num>=180)
-  60   1        // {
-  61   1        //  P1=0xFC;//15分钟到，1111 1100
-  62   1        // }
-  63   1        // if (Time_num>=360)
-  64   1        // {
-  65   1        //  P1=0xF8;//30分钟到，1111 1000
-  66   1        // }
-  67   1        // if (Time_num>=400)
-  68   1        // {
-  69   1        //  P1=0xF0;//45分钟到，1111 0000
-  70   1        // }
-  71   1        // if (Time_num==450)
-  72   1        // {
-  73   1        //  P1=0xFF;//60分钟到，1111 1111
-  74   1        //  Time_num=0;//复位
-  75   1        // }
-  76   1        // TR0=1;
-  77   1      }
+  55   2          do
+  56   2          {
+  57   3            while (--k);
+  58   3          } while (--j);
+  59   2        } while (--i);
+  60   1      }
+  61          
+  62          
+  63          
+  64          //定时器0初始化,50ms的计数时间
+  65          void Timer_Init()
+  66          {
+  67   1        TMOD &= 0xF0;   //设置定时器模式
+  68   1        TMOD |= 0x01;   //设置定时器模式
+  69   1        TL0 = 0xB0;   //设置定时初始值
+  70   1        TH0 = 0x3C;   //设置定时初始值
+  71   1        TF0 = 0;    //清除TF0标志
+  72   1        ET0=1;      //开启定时器中断
+  73   1        EA=1;     //开启总中断
+  74   1      }
+  75          
+  76          //时间计数
+  77          void Time_Count()
+  78          {
+  79   1        char i=0;
+  80   1        if (Seconds_num==9)
+  81   1        {
+  82   2          LED_w2=0;//15分钟到，1111 1100
+  83   2          Buzzer=0;
+  84   2          Delay100ms();
+  85   2          Buzzer=1;
+  86   2        }
+  87   1      
+  88   1        if (Seconds_num==18)
+  89   1        {
+  90   2          LED_w3=0;//30分钟到，1111 1000
+  91   2          Buzzer=0;
+  92   2          Delay100ms();
+  93   2          Buzzer=1;
+  94   2        }
+  95   1      
+  96   1        if (Seconds_num==27)
+  97   1        {
+  98   2          LED_r=0;//45分钟到，1111 0000
+  99   2          Buzzer=0;
+ 100   2          Delay100ms();
+ 101   2          Buzzer=1;
+ 102   2        }
+ 103   1      
+ 104   1        if (Seconds_num==36)
+ 105   1        {
+ 106   2          // P1&=0x0F;//60分钟到，1110 1111 
+ 107   2          for (i=0;i<3;i++)
+ 108   2          {
+ 109   3            Buzzer=0;
+ 110   3            Delay500ms();
+ 111   3            Buzzer=1;
+ 112   3            Delay500ms();
+ 113   3          }     
+ 114   2          TR0=0;
+ 115   2        }
+ 116   1      }
+C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:45:48 PAGE 3   
+
+ 117          
+ 118          //按键检测
+ 119          void Key_Detection()
+ 120          {
+ 121   1        //算出按动时长
+ 122   1        if (key_num==0)
+ 123   1        {
+ 124   2          Delay3ms();//按键消抖
+ 125   2          while (key_num==0)//判断是否按下按键
+ 126   2          {
+ 127   3            TR0=1;
+ 128   3            LED_w1=0;
+ 129   3          }
+ 130   2        }
+ 131   1        if (star_num==0)
+ 132   1        {
+ 133   2          Delay3ms();
+ 134   2          if (star_num==0)
+ 135   2          {
+ 136   3            TR0=0;
+ 137   3            P1=0xFF;
+ 138   3            Seconds_num=0;
+ 139   3          }
+ 140   2          
+ 141   2        }
+ 142   1      }
+ 143          
+ 144          //主函数
+ 145          int main()
+ 146          {
+ 147   1        LED_star=1;
+ 148   1        Timer_Init();
+ 149   1        P1=0xFF;
+ 150   1        while(1)
+ 151   1        {
+ 152   2          Time_Count();
+ 153   2          Key_Detection();
+ 154   2          LED_star=~TR0;//指示灯
+ 155   2        }
+ 156   1      }
+ 157          
+ 158          
+ 159          //定时器中断服务
+ 160          void Timer0_isr() interrupt 1
+ 161          {
+ 162   1        
+ 163   1        TL0 = 0xB0;   //设置定时初始值
+ 164   1        TH0 = 0x3C;   //设置定时初始值
+ 165   1        Time_num++;//将该数字加一
+ 166   1        if(Time_num==20)//1秒计时
+ 167   1        {
+ 168   2          Seconds_num++;//1秒到
+ 169   2          Time_num=0;
+ 170   2        }
+ 171   1      
+ 172   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     78    ----
+   CODE SIZE        =    215    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
+C51 COMPILER V9.59.0.0   MAIN                                                              07/05/2022 16:45:48 PAGE 4   
+
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =      2    ----
+   DATA SIZE        =      5    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.
